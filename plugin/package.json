@@ -1,6 +1,6 @@
 {
   "name": "@xeaser/opencode-obsidian-sync",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Sync OpenCode AI sessions to Obsidian as structured Markdown notes with auto-tagging and Dataview dashboards",
   "type": "module",
   "main": "dist/index.js",
@@ -12,12 +12,14 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md"
   ],
   "scripts": {
     "build": "bun build index.ts --outdir dist --target bun --external @opencode-ai/plugin --external @opencode-ai/sdk --minify",
     "typecheck": "tsc --noEmit",
     "test": "bun test",
+    "prepack": "cp ../README.md README.md",
     "prepublishOnly": "bun run build"
   },
   "repository": {
