@@ -1,0 +1,13 @@
+node_modules/
+dist/
+.DS_Store
+*.tsbuildinfo
+
+# Sync state (per-machine)
+sync/.sync-state.json
+
+# Queue cache (ephemeral)
+.cache/
+
+# Sisyphus orchestration files
+.sisyphus/

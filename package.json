@@ -1,0 +1,5 @@
+{
+  "name": "opencode-obsidian-sync",
+  "private": true,
+  "workspaces": ["lib", "sync", "plugin"]
+}
