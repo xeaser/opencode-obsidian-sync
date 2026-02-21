@@ -1,12 +1,44 @@
 {
-  "name": "@opencode-obsidian-sync/plugin",
+  "name": "@xeaser/opencode-obsidian-sync",
   "version": "0.1.0",
+  "description": "Sync OpenCode AI sessions to Obsidian as structured Markdown notes with auto-tagging and Dataview dashboards",
   "type": "module",
-  "main": "index.ts",
-  "scripts": {
-    "typecheck": "tsc --noEmit",
-    "test": "bun test"
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
   },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "bun build index.ts --outdir dist --target bun --external @opencode-ai/plugin --external @opencode-ai/sdk --minify",
+    "typecheck": "tsc --noEmit",
+    "test": "bun test",
+    "prepublishOnly": "bun run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/xeaser/opencode-obsidian-sync.git",
+    "directory": "plugin"
+  },
+  "homepage": "https://github.com/xeaser/opencode-obsidian-sync#readme",
+  "bugs": {
+    "url": "https://github.com/xeaser/opencode-obsidian-sync/issues"
+  },
+  "keywords": [
+    "opencode",
+    "obsidian",
+    "sync",
+    "ai-sessions",
+    "markdown",
+    "dataview"
+  ],
+  "license": "MIT",
+  "author": "xeaser",
   "dependencies": {
     "@opencode-obsidian-sync/lib": "workspace:*"
   },

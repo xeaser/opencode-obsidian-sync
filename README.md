@@ -178,15 +178,29 @@ The import script:
 
 ### 2. Real-Time Sync (oh-my-opencode Plugin)
 
-Register the plugin in your oh-my-opencode config (`~/.config/opencode/config.json` or project-level):
+**Install via npm** (recommended):
 
-```json
+Add to the `plugin` array in `~/.config/opencode/opencode.json`:
+
+```jsonc
 {
-  "plugins": {
-    "obsidian-sync": {
-      "package": "/path/to/opencode-obsidian-sync/plugin"
-    }
-  }
+  "plugin": [
+    "oh-my-opencode@latest",
+    "@xeaser/opencode-obsidian-sync"
+    // ... other plugins
+  ]
+}
+```
+
+OpenCode auto-installs npm plugins at startup. No cloning or local paths needed.
+
+**Or use a local path** (for development):
+
+```jsonc
+{
+  "plugin": [
+    "/path/to/opencode-obsidian-sync/plugin"
+  ]
 }
 ```
 
