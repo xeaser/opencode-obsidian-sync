@@ -101,7 +101,7 @@ function getEnqueueCalls(): Array<[string, string, string]> {
 }
 
 // ===========================================================================
-// pollForDeletions — consecutive failure counting
+// pollForDeletions — foundInStorage guard + consecutive failure counting
 // ===========================================================================
 
 describe("pollForDeletions", () => {
@@ -110,20 +110,43 @@ describe("pollForDeletions", () => {
     resetAllMocks();
   });
 
-  test("should NOT trash a session on first readSession failure", async () => {
-    await onSessionCreated(makeSessionInfo({ id: "ses_poll_1" }));
+  const validSession = { id: "ses_poll", title: "Test", time: { created: Date.now() } };
+
+  // Helper: create session and mark it as found in storage via a successful poll
+  async function createAndDiscover(id: string) {
+    await onSessionCreated(makeSessionInfo({ id }));
+    resetAllMocks();
+    mockReadSession.mockImplementation(() => Promise.resolve({ ...validSession, id }));
+    await pollForDeletions();
+    resetAllMocks();
+  }
+
+  test("should NEVER trash sessions not found in storage (subagent sessions)", async () => {
+    await onSessionCreated(makeSessionInfo({ id: "ses_poll_sub" }));
     resetAllMocks();
 
     mockReadSession.mockImplementation(() => Promise.resolve(null));
+    await pollForDeletions();
+    await pollForDeletions();
+    await pollForDeletions();
+    await pollForDeletions();
     await pollForDeletions();
 
     // obsidianGet is ONLY called from moveToTrash — zero calls means no trashing
     expect(mockObsidianGet.mock.calls.length).toBe(0);
   });
 
-  test("should NOT trash a session after 2 consecutive failures", async () => {
-    await onSessionCreated(makeSessionInfo({ id: "ses_poll_2" }));
-    resetAllMocks();
+  test("should NOT trash on first failure after being found in storage", async () => {
+    await createAndDiscover("ses_poll_1");
+
+    mockReadSession.mockImplementation(() => Promise.resolve(null));
+    await pollForDeletions();
+
+    expect(mockObsidianGet.mock.calls.length).toBe(0);
+  });
+
+  test("should NOT trash after 2 consecutive failures", async () => {
+    await createAndDiscover("ses_poll_2");
 
     mockReadSession.mockImplementation(() => Promise.resolve(null));
     await pollForDeletions();
@@ -132,9 +155,8 @@ describe("pollForDeletions", () => {
     expect(mockObsidianGet.mock.calls.length).toBe(0);
   });
 
-  test("should trash a session after 3 consecutive failures", async () => {
-    await onSessionCreated(makeSessionInfo({ id: "ses_poll_3" }));
-    resetAllMocks();
+  test("should trash after 3 consecutive failures (session was previously in storage)", async () => {
+    await createAndDiscover("ses_poll_3");
 
     mockReadSession.mockImplementation(() => Promise.resolve(null));
     mockObsidianGet.mockImplementation(() => Promise.resolve("---\nsummary content\n---"));
@@ -147,20 +169,18 @@ describe("pollForDeletions", () => {
   });
 
   test("should reset failure counter when readSession succeeds", async () => {
-    const validSession = { id: "ses_poll_4", title: "Test", time: { created: Date.now() } };
-    await onSessionCreated(makeSessionInfo({ id: "ses_poll_4" }));
-    resetAllMocks();
+    await createAndDiscover("ses_poll_4");
 
     // 2 failures
     mockReadSession.mockImplementation(() => Promise.resolve(null));
     await pollForDeletions();
     await pollForDeletions();
 
-    // 1 success → resets counter
-    mockReadSession.mockImplementation(() => Promise.resolve(validSession));
+    // 1 success resets counter
+    mockReadSession.mockImplementation(() => Promise.resolve({ ...validSession, id: "ses_poll_4" }));
     await pollForDeletions();
 
-    // 2 more failures (consecutive count = 2, not 4)
+    // 2 more failures (consecutive count restarted at 0, now 2 — below threshold)
     mockReadSession.mockImplementation(() => Promise.resolve(null));
     await pollForDeletions();
     await pollForDeletions();
@@ -168,15 +188,14 @@ describe("pollForDeletions", () => {
     expect(mockObsidianGet.mock.calls.length).toBe(0);
   });
 
-  test("should still track session after transient failure (not remove from internal map)", async () => {
+  test("should still track session after transient failure", async () => {
     await onSessionCreated(makeSessionInfo({ id: "ses_poll_5" }));
     resetAllMocks();
 
-    // One failed poll
     mockReadSession.mockImplementation(() => Promise.resolve(null));
     await pollForDeletions();
 
-    // Session should still be tracked: onSessionUpdated should process it
+    // Session should still be tracked — onSessionUpdated should process it
     mockReconstructConversation.mockImplementation(() =>
       Promise.resolve({
         session: { id: "ses_poll_5", title: "Test", time: { created: Date.now() } },
@@ -193,8 +212,30 @@ describe("pollForDeletions", () => {
       time: { created: Date.now(), updated: Date.now() },
     });
 
-    // reconstructConversation being called proves the session is still tracked
     expect(mockReconstructConversation.mock.calls.length).toBeGreaterThan(0);
+  });
+
+  test("should set foundInStorage on first successful read", async () => {
+    await onSessionCreated(makeSessionInfo({ id: "ses_poll_6" }));
+    resetAllMocks();
+
+    // First poll: null — session not found, foundInStorage stays false
+    mockReadSession.mockImplementation(() => Promise.resolve(null));
+    await pollForDeletions();
+
+    // Second poll: success — foundInStorage becomes true
+    mockReadSession.mockImplementation(() => Promise.resolve({ ...validSession, id: "ses_poll_6" }));
+    await pollForDeletions();
+    resetAllMocks();
+
+    // Now 3 consecutive failures should trigger trashing (foundInStorage is true)
+    mockReadSession.mockImplementation(() => Promise.resolve(null));
+    mockObsidianGet.mockImplementation(() => Promise.resolve("content"));
+    await pollForDeletions();
+    await pollForDeletions();
+    await pollForDeletions();
+
+    expect(countEnqueueCalls("create", "/trash/")).toBeGreaterThan(0);
   });
 
   test("should handle empty sessions map gracefully", async () => {

@@ -21,6 +21,7 @@ interface SessionTracker {
   summaryPath: string;
   messageCount: number;
   lastMessageSync: number;
+  foundInStorage: boolean;
 }
 
 const sessions = new Map<string, SessionTracker>();
@@ -343,7 +344,10 @@ export async function pollForDeletions(): Promise<void> {
   for (const [sessionId, tracker] of sessions.entries()) {
     try {
       const session = await readSession(sessionId, tracker.projectId);
-      if (session === null) {
+      if (session !== null) {
+        tracker.foundInStorage = true;
+        deletionFailures.delete(sessionId);
+      } else if (tracker.foundInStorage) {
         const failures = (deletionFailures.get(sessionId) || 0) + 1;
         deletionFailures.set(sessionId, failures);
         if (failures >= DELETION_THRESHOLD) {
@@ -351,12 +355,11 @@ export async function pollForDeletions(): Promise<void> {
           sessions.delete(sessionId);
           deletionFailures.delete(sessionId);
         }
-      } else {
-        deletionFailures.delete(sessionId);
       }
     } catch {}
   }
 }
+
 
 export async function onSessionCreated(
   sessionInfo: { id: string; projectID: string; title: string; directory: string; time: { created: number } },
@@ -375,6 +378,7 @@ export async function onSessionCreated(
       summaryPath,
       messageCount: 0,
       lastMessageSync: 0,
+      foundInStorage: false,
     });
 
     const content = buildSkeletonSummary(
@@ -424,6 +428,7 @@ export async function onSessionIdle(sessionId: string): Promise<void> {
 
     const freshSession = await readSession(sessionId, tracker.projectId);
     if (freshSession) {
+      tracker.foundInStorage = true;
       const created = formatDate(freshSession.time.created);
       const currentTitle = freshSession.title || freshSession.slug || freshSession.id;
       handleRenameIfNeeded(tracker, currentTitle, created);
