@@ -42,14 +42,15 @@ OpenCode Storage                    Obsidian Vault
 ## Prerequisites
 
 - [Bun](https://bun.sh) v1.0+ runtime
-- [Obsidian](https://obsidian.md) with the [Local REST API](https://github.com/coddingtonbear/obsidian-local-rest-api) community plugin installed and enabled
-- [OpenCode](https://github.com/sst/opencode) (the data source)
-- [Dataview](https://github.com/blacksmithgu/obsidian-dataview) Obsidian plugin (for dashboard queries)
+- [OpenCode](https://github.com/sst/opencode) with [oh-my-opencode](https://github.com/nicholasgriffintn/oh-my-opencode) plugin system (for real-time sync)
+- [Obsidian](https://obsidian.md) with:
+  - [Local REST API](https://github.com/coddingtonbear/obsidian-local-rest-api) community plugin (required)
+  - [Dataview](https://github.com/blacksmithgu/obsidian-dataview) community plugin (for dashboard queries)
 
 ## Installation
 
 ```bash
-git clone https://github.com/<your-user>/opencode-obsidian-sync.git
+git clone https://github.com/xeaser/opencode-obsidian-sync.git
 cd opencode-obsidian-sync
 bun install
 ```
@@ -175,9 +176,9 @@ The import script:
 - Derives note folder names from session titles (not random slugs)
 - Splits sessions exceeding 300 messages into numbered parts
 
-### 2. Real-Time Sync (Plugin)
+### 2. Real-Time Sync (oh-my-opencode Plugin)
 
-Register the plugin in your OpenCode config (`~/.config/opencode/config.json` or project-level):
+Register the plugin in your oh-my-opencode config (`~/.config/opencode/config.json` or project-level):
 
 ```json
 {
