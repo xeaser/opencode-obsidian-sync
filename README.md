@@ -42,7 +42,7 @@ OpenCode Storage                    Obsidian Vault
 ## Prerequisites
 
 - [Bun](https://bun.sh) v1.0+ runtime
-- [OpenCode](https://github.com/sst/opencode) with [oh-my-opencode](https://github.com/nicholasgriffintn/oh-my-opencode) plugin system (for real-time sync)
+- [OpenCode](https://github.com/sst/opencode) with [oh-my-opencode](https://github.com/code-yeongyu/oh-my-opencode) plugin system (for real-time sync)
 - [Obsidian](https://obsidian.md) with:
   - [Local REST API](https://github.com/coddingtonbear/obsidian-local-rest-api) community plugin (required)
   - [Dataview](https://github.com/blacksmithgu/obsidian-dataview) community plugin (for dashboard queries)
