@@ -1,5 +1,8 @@
 # opencode-obsidian-sync
 
+[![npm version](https://img.shields.io/npm/v/@xeaser/opencode-obsidian-sync)](https://www.npmjs.com/package/@xeaser/opencode-obsidian-sync)
+[![license](https://img.shields.io/npm/l/@xeaser/opencode-obsidian-sync)](./LICENSE)
+
 Sync [OpenCode](https://github.com/sst/opencode) AI coding sessions into an [Obsidian](https://obsidian.md) vault as structured, searchable Markdown notes. Supports historical bulk import and real-time sync via an oh-my-opencode plugin.
 
 OpenCode stores session data (messages, tool calls, metadata) in a local JSON-based store. This project extracts that data, formats it as Markdown with YAML frontmatter, and writes it to an Obsidian vault via the [Local REST API](https://github.com/coddingtonbear/obsidian-local-rest-api) plugin. The result is a fully navigable knowledge base of every AI coding session, complete with Dataview dashboards, cross-session backlinks, auto-tagging, and full-text search.
@@ -269,7 +272,7 @@ Processed sequentially every 7 seconds. Stops on first failure to preserve order
 cd lib && bun test       # 28 tests
 
 # Plugin tests (deletion protection, console output, session lifecycle, renames)
-cd plugin && bun test    # 25 tests
+cd plugin && bun test    # 27 tests
 ```
 
 ## Troubleshooting
