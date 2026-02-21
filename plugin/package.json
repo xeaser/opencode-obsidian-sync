@@ -1,6 +1,6 @@
 {
   "name": "@xeaser/opencode-obsidian-sync",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Sync OpenCode AI sessions to Obsidian as structured Markdown notes with auto-tagging and Dataview dashboards",
   "type": "module",
   "main": "dist/index.js",
@@ -39,10 +39,8 @@
   ],
   "license": "MIT",
   "author": "xeaser",
-  "dependencies": {
-    "@opencode-obsidian-sync/lib": "workspace:*"
-  },
   "devDependencies": {
+    "@opencode-obsidian-sync/lib": "workspace:*",
     "@opencode-ai/sdk": "*",
     "@types/node": "*",
     "typescript": "*",
