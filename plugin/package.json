@@ -1,0 +1,22 @@
+{
+  "name": "@opencode-obsidian-sync/plugin",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "@opencode-obsidian-sync/lib": "workspace:*"
+  },
+  "devDependencies": {
+    "@opencode-ai/sdk": "*",
+    "@types/node": "*",
+    "typescript": "*",
+    "zod": "^4.3.6"
+  },
+  "peerDependencies": {
+    "@opencode-ai/plugin": ">=0.1.0"
+  }
+}
